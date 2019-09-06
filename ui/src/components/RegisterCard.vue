@@ -123,7 +123,7 @@ export default {
       isLocal: true,
     };
   },
-  beforeCreate() {
+  beforeMount() {
     this.$axios.post('/utils/check-local')
       .then(() => {
         this.isLocal = true;
@@ -131,6 +131,10 @@ export default {
       .catch(() => {
         this.isLocal = false;
       });
+
+    if (this.$store.state.show_alert) {
+      this.$store.state.show_alert = false;
+    }
   },
   methods: {
     fieldError(type) {

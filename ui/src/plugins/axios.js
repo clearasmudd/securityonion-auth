@@ -9,19 +9,13 @@ no-unused-vars
 import Vue from 'vue';
 import axios from 'axios';
 
-// Full config:  https://github.com/axios/axios#request-config
-// axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || 'http://127.0.0.1:5000/auth';
-// axios.defaults.headers.common.Authorization = AUTH_TOKEN;
-// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-
 const config = {
-  baseURL: process.env.baseURL || process.env.apiUrl || 'http://localhost:5000',
+  baseURL: process.env.API_URL || 'http://127.0.0.1:5000',
   timeout: 60 * 1000, // Timeout
   // withCredentials: true, // Check cross-site Access-Control
 };
 
 const axiosInstance = axios.create(config);
-
 
 /* axiosInstance.interceptors.request.use(
   (config) => {

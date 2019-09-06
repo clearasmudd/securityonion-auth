@@ -104,6 +104,11 @@ export default {
       validating: false,
     };
   },
+  beforeMount() {
+    if (this.$store.state.show_alert) {
+      this.$store.state.show_alert = false;
+    }
+  },
   methods: {
     fieldError(type) {
       if (this.validating) { return 'validating'; }
