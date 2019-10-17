@@ -1,4 +1,3 @@
-import re
 from enum import Enum, auto
 
 UNAUTHORIZED_ERR = 'Unauthorized'
@@ -18,8 +17,6 @@ LOGIN_FAIL_RESPONSE: dict = {
     'status': 'fail',
     'message': 'Incorrect username or password'
 }
-
-PASSWORD_REGEX = re.compile('(?=.{6,})')
 
 
 class TokenType(Enum):

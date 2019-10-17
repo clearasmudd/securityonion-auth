@@ -29,7 +29,7 @@ class User(db.Model):
         self.pw_salt = bcrypt.gensalt(12)
         self.pw_hash = bcrypt.hashpw(password.encode('UTF-8'), self.pw_salt)
         self.failed_login_attempts = 0
-        self.logged_in = True
+        self.logged_in = False
         self.remember_me = remember_me
         self.last_login = now
         self.last_contact = now
@@ -53,7 +53,7 @@ class User(db.Model):
             utc_now = datetime.utcnow()
             if is_refresh:
                 expire_time = timedelta(days=app.config.get('REFRESH_TOKEN_TIMEOUT'))
-                context = 'is_refresh'
+                context = 'refresh'
             else:
                 expire_time = timedelta(days=0, minutes=app.config.get('AUTH_TOKEN_TIMEOUT'))
                 context = 'auth'
@@ -70,7 +70,7 @@ class User(db.Model):
                 key=secret_key,
                 algorithm='HS256'
             )
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             return e
 
     @staticmethod
@@ -81,12 +81,28 @@ class User(db.Model):
         :param auth_token: string
         :return: integer|string
         """
+        invalid_token_message = 'Invalid token, please log in again'
+
         try:
-            payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))
+            payload = jwt.decode(auth_token, key=app.config.get('SECRET_KEY'), algorithms=['HS256'])
+
+            if is_refresh:
+                if payload['context'] != 'refresh':
+                    return {
+                        'message': invalid_token_message,
+                        'error_code': 401,
+                    }
+            else:
+                if payload['context'] != 'auth':
+                    return {
+                        'message': invalid_token_message,
+                        'error_code': 401,
+                    }
+
             if not payload.keys().__contains__('username') or not payload.keys().__contains__('user_id') \
                     or not payload.keys().__contains__('context'):
                 return {
-                    'message': 'Invalid token',
+                    'message': invalid_token_message,
                     'error_code': 401
                 }
             else:
@@ -99,15 +115,15 @@ class User(db.Model):
             if not is_refresh:
                 return {
                     'message': 'Signature expired, please refresh token',
-                    'error_code': 302
+                    'error_code': 307,
                 }
             else:
                 return {
                     'message': 'Signature expired, please log in again',
-                    'error_code': 401
+                    'error_code': 401,
                 }
         except jwt.InvalidTokenError:
             return {
-                'message': 'Invalid token, please log in again',
-                'error_code': 401
+                'message': invalid_token_message,
+                'error_code': 401,
             }
