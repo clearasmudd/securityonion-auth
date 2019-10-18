@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  reverseproxy:
+    container_name: reverseproxy
+    build: ./docker-dev
+    image: reverseproxy
+    network_mode: host
+    ports:
+      - 8080:8080
+    depends_on: 
+      - so-auth-api
+      - so-auth-ui
+
+  so-auth-api:
+    container_name: so-auth-api
+    environment: 
+      - BASE_PATH=/so-auth/api/v1
+    build: ./api
+    ports:
+      - 5656:5656
+    image: so-auth/api
+    restart: always
+
+  so-auth-ui:
+    container_name: so-auth-ui
+    build: ./ui
+    ports:
+      - 4242:4242
+    image: so-auth/ui
+    restart: always
