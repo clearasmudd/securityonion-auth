@@ -48,7 +48,7 @@
           </a-form-item>
         </a-col>
         <a-form-item style="margin-bottom: 0.5em;">
-          <router-link to="/change-password">Change password</router-link>
+          <router-link to="/change_password">Change password</router-link>
         </a-form-item>
         <a-form-item style="margin-left: 0.25em;">
           <a-checkbox
@@ -77,6 +77,7 @@
             </a-button>
           </a-form-item>
         </a-col>
+        <!--
         <a-col :span="12">
           <div class="login-link">
             Or
@@ -85,6 +86,7 @@
             </router-link>
           </div>
         </a-col>
+        -->
       </a-row>
     </a-form>
   </a-card>
@@ -94,6 +96,8 @@
 import AFormItem from 'ant-design-vue/es/form/FormItem';
 import ARow from 'ant-design-vue/es/grid/Row';
 import ACol from 'ant-design-vue/es/grid/Col';
+
+const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 export default {
   name: 'LoginCard',
@@ -128,12 +132,15 @@ export default {
 
           setTimeout(() => {
             this.$axios.post('/auth/login', data)
-              .then((res) => {
+              .then(async (res) => {
                 this.$store.state.api_response = res.data;
                 this.$store.state.api_response.alert_type = 'success';
                 this.$store.state.show_alert = true;
-                if (this.$cookie.get('Redirect')) {
-                  window.location.replace(this.$cookie.get('Redirect'));
+
+                await sleep(100);
+
+                if (res.data.redirect !== '') {
+                  window.location = res.data.redirect;
                 }
               })
               .catch((error) => {
@@ -144,7 +151,7 @@ export default {
                   } else {
                     this.$store.state.api_response.alert_type = 'warning';
                   }
-                } else {
+                } else if (error) {
                   this.$store.state.api_response.alert_type = 'error';
                   this.$store.state.api_response.message = 'No response from server';
                 }

@@ -1,20 +1,21 @@
-FROM node:lts-alpine
+FROM node:latest AS build-stage
 LABEL maintainer="william.wernert@securityonionsolutions.com"
 
-ARG SSL_CERT
-ARG SSL_KEY
-ARG API_URL
-ARG API_PORT="5000"
+# RUN npm install -g http-server
 
-ENV API_URL="https://l${API_URL}:${API_URL}"
-
-RUN npm install -g http-server
+RUN mkdir -p /app
+WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm install --loglevel warn
 
 COPY . .
 RUN npm run build --modern
 
-EXPOSE 8080
-ENTRYPOINT [ "http-server", "-ssl", "--cert", "${SSL_CERT}", "--key", "${SSL_KEY}", "--cors", "dist" ]
+FROM nginx as production-stage
+RUN mkdir /app
+COPY --from=build-stage /app/dist /app
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 4242
+# ENTRYPOINT [ "http-server", "--cors", "dist", "-p", "8000" ]

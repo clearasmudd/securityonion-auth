@@ -10,7 +10,7 @@ import Vue from 'vue';
 import axios from 'axios';
 
 const config = {
-  baseURL: process.env.API_URL || 'http://127.0.0.1:5000',
+  baseURL: process.env.VUE_APP_API_URI,
   timeout: 60 * 1000, // Timeout
   // withCredentials: true, // Check cross-site Access-Control
 };

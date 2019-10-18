@@ -134,6 +134,9 @@ import AFormItem from 'ant-design-vue/es/form/FormItem';
 import ARow from 'ant-design-vue/es/grid/Row';
 import ACol from 'ant-design-vue/es/grid/Col';
 
+const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+
+
 export default {
   name: 'ChangePasswordCard',
   components: { ACol, ARow, AFormItem },
@@ -166,11 +169,14 @@ export default {
           };
 
           setTimeout(() => {
-            this.$axios.post('/users/change-password', data)
-              .then((res) => {
+            this.$axios.put('/users/change_password', data)
+              .then(async (res) => {
                 this.$store.state.api_response = res.data;
                 this.$store.state.api_response.alert_type = 'success';
                 this.$store.state.show_alert = true;
+
+                await sleep(2000);
+
                 this.$router.push('login');
               })
               .catch((error) => {
@@ -181,7 +187,7 @@ export default {
                   } else {
                     this.$store.state.api_response.alert_type = 'warning';
                   }
-                } else {
+                } else if (error) {
                   this.$store.state.api_response.alert_type = 'error';
                   this.$store.state.api_response.message = 'No response from server';
                 }
