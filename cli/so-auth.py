@@ -25,18 +25,20 @@ class AppState(object):
             config = Config(f)
 
             # Begin reading in values from config file
-            config_readline = 'api_url'
+            config_readline = 'API_URI'
             try:
                 self.api_uri = config.API_URI
-                config_readline = 'debug'
+                config_readline = 'DEBUG'
                 self.debug = config.DEBUG
             except Exception as e:
                 if self.debug:
                     click.echo(e)
                 click.echo(f'Failed to read key {config_readline} from config file')
                 sys.exit(-1)
-        except Exception:
-            click.echo('Could not find config file "so-auth.cfg"')
+        except Exception as e:
+            click.echo(f'Could not read config file "{config_filename}"')
+            click.echo()
+            click.echo(e)
             sys.exit(-1)
 
 
@@ -90,10 +92,15 @@ def create_user(appstate, username, password):
         except ValueError as e:
             if appstate.debug:
                 click.echo(e)
-            elif appstate.verbose:
-                click.echo('Response does not contain JSON.')
+            if appstate.verbose:
+                click.echo('Response does not contain JSON')
             else:
                 click.echo('Unexpected API response, please check service logs')
+            sys.exit(-1)
+        except Exception as e:
+            if appstate.debug:
+                click.echo(e)
+            click.echo('Unhandled error occurred')
             sys.exit(-1)
 
     except ConnectionError as e:
