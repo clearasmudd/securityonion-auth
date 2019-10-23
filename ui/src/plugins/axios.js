@@ -58,3 +58,4 @@ Plugin.install = (Vue, options) => {
 Vue.use(Plugin);
 
 export default Plugin;
+

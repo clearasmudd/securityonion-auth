@@ -21,3 +21,4 @@ EXPOSE 5656
 
 WORKDIR /app/api/api
 ENTRYPOINT [ "gunicorn", "-b", "0.0.0.0:5656", "api:create_app()" ]
+

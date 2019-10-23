@@ -29,3 +29,4 @@ services:
       - 4242:4242
     image: so-auth/ui
     restart: always
+
