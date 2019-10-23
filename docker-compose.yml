@@ -15,7 +15,7 @@ services:
   so-auth-api:
     container_name: so-auth-api
     environment: 
-      - BASE_PATH=/so-auth/api/v1
+      - BASE_PATH=/so-auth/api
     build: ./api
     ports:
       - 5656:5656
